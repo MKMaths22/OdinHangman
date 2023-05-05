@@ -3,10 +3,12 @@ class Game
     attr_accessor :guesses_remaining, :all_guessed_letters, :incorrect_guessed_letters, :state_of_word, :secret_word, :player_name
     
     ALPHA_REGEX = /^[A-Z]$/
+    REGEX_ERROR = "Not accepted. Please enter one letter from the alphabet."
+    DUP_ERROR = "You've already guessed that letter. Please choose another."
     
     def initialize
         @guesses_remaining = 7
-        @all_guessed_letters = []
+        @all_guessed_letters = ['E']
         @incorrect_guessed_letters = []
         @state_of_word = ''
         @secret_word = ''
@@ -40,18 +42,14 @@ class Game
     
     def choose_a_letter
         puts "#{@player_name}, pick a letter you think might be in the word. You have #{@guesses_remaining} incorrect guesses remaining."
-        valid = false
-          until valid
-            inputted = gets.upcase.strip 
-            if inputted.match(ALPHA_REGEX)
-              if @all_guessed_letters.include?(inputted)
-                puts "You've already guessed that letter. Please choose another."
-              else
-                valid = true
-              end
-            else puts "Not accepted. Please enter one letter from the alphabet."
-            end
+          valid = 0
+          until valid == 2
+            valid = 0
+            input = gets.upcase.strip 
+            input.match(ALPHA_REGEX) ? valid += 1 : (puts REGEX_ERROR)
+            @all_guessed_letters.include?(input) ? (puts DUP_ERROR) : valid += 1
           end
+        input 
     end
 
 end
