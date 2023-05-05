@@ -2,6 +2,8 @@ class Game
     
     attr_accessor :guesses_remaining, :all_guessed_letters, :incorrect_guessed_letters, :state_of_word, :secret_word, :player_name
     
+    ALPHA_REGEX = /^[a-zA-Z]$/
+    
     def initialize
         @guesses_remaining = 7
         @all_guessed_letters = []
@@ -34,13 +36,23 @@ class Game
         puts "The computer has chosen a secret word with #{size} letters. Can you solve it, #{@player_name}?"
         self.state_of_word = '------------'[0,size]
         puts @state_of_word
-    end 
+    end
+    
+    def choose_a_letter
+        puts "#{@player_name}, pick a letter you think might be in the word. You have #{@guesses_remaining} incorrect guesses remaining."
+        inputted = gets.strip 
+        unless inputted.match(ALPHA_REGEX)
+            puts "That is not acceptable"
+        end
+    
+    end
 
 end
 
 this_game = Game.new
 this_game.start_the_game
 puts this_game.secret_word
+this_game.choose_a_letter
 # while this_game.guesses_remaining > 0
     # give player option to save the game
     # 
