@@ -1,6 +1,6 @@
 class Game
     
-    attr_accessor :guesses_remaining, :all_guessed_letters, :incorrect_guessed_letters, :state_of_word, :secret_word, :player_name
+    attr_accessor :guesses_remaining, :all_guessed_letters, :incorrect_guessed_letters, :state_of_word, :secret_word, :player_name, :game_saved
     
     ALPHA_REGEX = /^[A-Z]$/
     REGEX_ERROR = "Not accepted. Please enter one letter from the alphabet."
@@ -39,7 +39,7 @@ class Game
         self.player_name = gets.strip
         puts "The computer has chosen a secret word with #{size} letters. Can you solve it, #{@player_name}?"
         self.state_of_word = '------------'[0,size]
-        puts @state_of_word
+        puts "Secret word: #{@state_of_word}"
     end
     
     def choose_a_letter
@@ -54,8 +54,9 @@ class Game
         input 
     end
 
-    def score_incorrect_guess
+    def score_incorrect_guess(letter)
         self.guesses_remaining -= 1
+        self.incorrect_guessed_letters.push(letter)
         puts "Hard luck, that letter does not appear in the word."
     end
 
@@ -90,9 +91,12 @@ while this_game.guesses_remaining > 0
     letter_chosen = this_game.choose_a_letter
     this_game.all_guessed_letters.push(letter_chosen)
     number_of_hits = this_game.secret_word.count(letter_chosen)
-    this_game.score_incorrect_guess if number_of_hits == 0
+    this_game.score_incorrect_guess(letter_chosen) if number_of_hits == 0
     this_game.score_correct_guess(letter_chosen, number_of_hits) if number_of_hits > 0
-    this_game.game_saved = false 
+    this_game.game_saved = false
+    puts "So far we have: #{this_game.state_of_word} \nand the incorrect #{this_game.incorrect_guessed_letters.size == 1 ? 'guess is' : 'guesses are'} #{this_game.incorrect_guessed_letters.join(', ')}"
+    puts "You have #{this_game.guesses_remaining == 1 ? 'just one incorrect guess remaining!' : "#{this_game.guesses_remaining} incorrect guesses remaining"}" 
+
 end
 
 
