@@ -8,7 +8,7 @@ class Game
     
     def initialize
         @guesses_remaining = 7
-        @all_guessed_letters = ['E']
+        @all_guessed_letters = []
         @incorrect_guessed_letters = []
         @state_of_word = ''
         @secret_word = ''
@@ -52,15 +52,31 @@ class Game
         input 
     end
 
+    def score_incorrect_guess
+        self.guesses_remaining -= 1
+        puts "Hard luck, that letter does not appear in the word."
+    end
+
 end
 
 this_game = Game.new
 this_game.start_the_game
-puts this_game.secret_word
-this_game.choose_a_letter
-# while this_game.guesses_remaining > 0
-    # give player option to save the game
-    # 
+
+while this_game.guesses_remaining > 0
+    puts "Would you like to save the game, #{this_game.player_name}?"
+    save, continue = false, false
+    until save || continue
+      puts 'Type Y to save or N to continue.'
+      save, continue = false, false
+      input = gets.strip.upcase
+      save = true if input == 'Y'
+      continue = true if input == 'N'
+    end
+    break if save  
+    this_game.choose_a_letter
+    this_game.score_incorrect_guess
+end
+
 
 
 # end
