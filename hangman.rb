@@ -13,6 +13,7 @@ class Game
         @state_of_word = ''
         @secret_word = ''
         @player_name = ''
+        @game_saved = false
 
     end
 
@@ -23,7 +24,8 @@ class Game
     end
 
     def save_game
-        # flesh this out later
+        puts "Game saved. This message is lying until saving actually works."
+        self.game_saved = true
     end
 
     def load_game
@@ -63,18 +65,19 @@ this_game = Game.new
 this_game.start_the_game
 
 while this_game.guesses_remaining > 0
-    puts "Would you like to save the game, #{this_game.player_name}?"
+    puts "Would you like to save the game, #{this_game.player_name}?" unless this_game.game_saved
     save, continue = false, false
     until save || continue
       puts 'Type Y to save or N to continue.'
-      save, continue = false, false
       input = gets.strip.upcase
       save = true if input == 'Y'
       continue = true if input == 'N'
     end
-    break if save  
+    this_game.save_game if save
+    next if save  
     this_game.choose_a_letter
     this_game.score_incorrect_guess
+    this_game.game_saved = false 
 end
 
 
