@@ -2,7 +2,7 @@ class Game
     
     attr_accessor :guesses_remaining, :all_guessed_letters, :incorrect_guessed_letters, :state_of_word, :secret_word, :player_name
     
-    ALPHA_REGEX = /^[a-zA-Z]$/
+    ALPHA_REGEX = /^[A-Z]$/
     
     def initialize
         @guesses_remaining = 7
@@ -16,7 +16,7 @@ class Game
 
     def find_random_word
         dictionary = File.open('edited_word_list.txt', 'r')
-        return dictionary.readlines.sample.chomp
+        return dictionary.readlines.sample.upcase.chomp
         dictionary.close
     end
 
@@ -40,11 +40,18 @@ class Game
     
     def choose_a_letter
         puts "#{@player_name}, pick a letter you think might be in the word. You have #{@guesses_remaining} incorrect guesses remaining."
-        inputted = gets.strip 
-        unless inputted.match(ALPHA_REGEX)
-            puts "That is not acceptable"
-        end
-    
+        valid = false
+          until valid
+            inputted = gets.upcase.strip 
+            if inputted.match(ALPHA_REGEX)
+              if @all_guessed_letters.include?(inputted)
+                puts "You've already guessed that letter. Please choose another."
+              else
+                valid = true
+              end
+            else puts "Not accepted. Please enter one letter from the alphabet."
+            end
+          end
     end
 
 end
