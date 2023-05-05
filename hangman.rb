@@ -59,6 +59,18 @@ class Game
         puts "Hard luck, that letter does not appear in the word."
     end
 
+    def score_correct_guess(letter, num)
+        (0..secret_word.length - 1).each do |i|
+            self.state_of_word[i] = secret_word[i] if secret_word[i] == letter
+        end
+        puts "Well done, the letter #{letter} appears #{plural_times(num)} in the word!"
+    
+    end
+
+    def plural_times(number)
+        number == 1 ? 'once' : "#{number} times"
+    end
+
 end
 
 this_game = Game.new
@@ -75,8 +87,11 @@ while this_game.guesses_remaining > 0
     end
     this_game.save_game if save
     next if save  
-    this_game.choose_a_letter
-    this_game.score_incorrect_guess
+    letter_chosen = this_game.choose_a_letter
+    this_game.all_guessed_letters.push(letter_chosen)
+    number_of_hits = this_game.secret_word.count(letter_chosen)
+    this_game.score_incorrect_guess if number_of_hits == 0
+    this_game.score_correct_guess(letter_chosen, number_of_hits) if number_of_hits > 0
     this_game.game_saved = false 
 end
 
