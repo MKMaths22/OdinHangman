@@ -38,7 +38,7 @@ class Game
         self.secret_word = find_random_word
         size = @secret_word.length
         puts "Welcome to Hangman. What is your name?" unless @player_name
-        self.player_name = gets.strip
+        self.player_name = gets.strip unless @player_name
         puts "The computer has chosen a secret word with #{size} letters. Can you solve it, #{@player_name}?"
         self.state_of_word = '------------'[0,size]
         puts "Secret word: #{@state_of_word}"
@@ -86,7 +86,7 @@ end
 def play_hangman(game)  
   game.start_the_game
 
-  while this_game.guesses_remaining > 0 && @solved == false 
+  loop do
     puts "Would you like to save the game, #{game.player_name}?" unless game.game_saved
     save, continue = false, false
     until save || continue
@@ -96,16 +96,17 @@ def play_hangman(game)
       continue = true if input == 'N'
     end
     game.save_game if save
-    next if save  
+    game.game_saved = false  
     letter_chosen = game.choose_a_letter
     game.all_guessed_letters.push(letter_chosen)
     number_of_hits = game.secret_word.count(letter_chosen)
     game.score_incorrect_guess(letter_chosen) if number_of_hits == 0
-    game.failed if game.guesses_remaining == 0
+    game.failed = true if game.guesses_remaining == 0
     game.score_correct_guess(letter_chosen, number_of_hits) if number_of_hits > 0
-    game.solved if game.state_of_word == game.secret_word
+    game.solved = true if game.state_of_word == game.secret_word
+    
     break if game.solved || game.failed
-    game.game_saved = false
+   
     puts "So far we have: #{game.state_of_word} \nand the incorrect #{game.incorrect_guessed_letters.size == 1 ? 'guess is' : 'guesses are'} #{game.incorrect_guessed_letters.join(', ')}"
     puts "You have #{game.guesses_remaining == 1 ? 'just one incorrect guess remaining!' : "#{game.guesses_remaining} incorrect guesses remaining"}" 
   end
