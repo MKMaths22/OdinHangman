@@ -29,18 +29,19 @@ class Game
 
     def save_game
         puts "Game saved. This message is lying until saving actually works."
-        saved_game_as_yaml = YAML::dump(self)
         self.game_saved = true
+        saved_game_as_yaml = YAML::dump(self)
         file_for_saving = File.new('gamesavedhere.txt', 'w')
         file_for_saving.puts saved_game_as_yaml
         file_for_saving.close
     end
 
-    def self.load_game
+    def load_game
         file_for_loading = File.open('gamesavedhere.txt', 'r')
         yaml_string = file_for_loading.read
         file_for_loading.close
         YAML::load(yaml_string)
+        play_hangman
     end
 
     def start_the_game
@@ -90,7 +91,7 @@ class Game
         number == 1 ? 'space' : "#{number} spaces"
     end
 
-    def play_hangman(game = self)  
+    def play_hangman
         start_the_game
       
         loop do
@@ -129,6 +130,6 @@ end
   
 puts "Would you like to load a previously saved game? Type Y for yes, anything else to continue."
 if gets.strip.upcase == 'Y' 
-    Game.load_game.play_hangman
-else Game.new.play_hangman
+    Game.new.play_hangman
+else Game.new.load_game
 end
