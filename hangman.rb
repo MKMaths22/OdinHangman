@@ -1,3 +1,5 @@
+require 'yaml'
+
 class Game
     
     attr_accessor :guesses_remaining, :all_guessed_letters, :incorrect_guessed_letters, :state_of_word, :secret_word, :player_name, :game_saved, :solved, :failed
@@ -27,7 +29,11 @@ class Game
 
     def save_game
         puts "Game saved. This message is lying until saving actually works."
+        saved_game_as_yaml = YAML::dump(self)
         self.game_saved = true
+        file_for_saving = File.new('gamesavedhere.txt', 'w')
+        file_for_saving.puts saved_game_as_yaml
+        file_for_saving.close
     end
 
     def load_game
