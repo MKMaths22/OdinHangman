@@ -36,10 +36,13 @@ class Game
         file_for_saving.close
     end
 
-    def load_game
-        # to be done later
+    def self.load_game
+        file_for_loading = File.open('gamesavedhere.txt', 'r')
+        yaml_string = file_for_loading.read
+        file_for_loading.close
+        YAML::load(yaml_string)
     end
-    
+
     def start_the_game
         self.secret_word = find_random_word
         size = @secret_word.length
@@ -87,41 +90,45 @@ class Game
         number == 1 ? 'space' : "#{number} spaces"
     end
 
+    def play_hangman(game = self)  
+        start_the_game
+      
+        loop do
+          puts "Would you like to save the game, #{player_name}?" unless game_saved
+          save, continue = false, false
+          until save || continue
+            puts 'Type Y to save or N to continue.'
+            input = gets.strip.upcase
+            save = true if input == 'Y'
+            continue = true if input == 'N'
+          end
+          save_game if save
+          self.game_saved = false  
+          letter_chosen = choose_a_letter
+          self.all_guessed_letters.push(letter_chosen)
+          number_of_hits = secret_word.count(letter_chosen)
+          score_incorrect_guess(letter_chosen) if number_of_hits == 0
+          self.failed = true if guesses_remaining == 0
+          score_correct_guess(letter_chosen, number_of_hits) if number_of_hits > 0
+          self.solved = true if state_of_word == secret_word
+          
+          break if solved || failed
+         
+          puts "So far we have: #{state_of_word} \nand the incorrect #{incorrect_guessed_letters.size == 1 ? 'guess is' : 'guesses are'} #{incorrect_guessed_letters.join(', ')}"
+          puts "You have #{guesses_remaining == 1 ? 'just one incorrect guess remaining!' : "#{guesses_remaining} incorrect guesses remaining"}" 
+        end
+      
+        sleep(2)
+      
+        puts "To play again, #{player_name}, press Y."
+        play_hangman(Game.new(player_name)) if gets.upcase.strip == 'Y'
+      
+    end
+
 end
   
-def play_hangman(game)  
-  game.start_the_game
-
-  loop do
-    puts "Would you like to save the game, #{game.player_name}?" unless game.game_saved
-    save, continue = false, false
-    until save || continue
-      puts 'Type Y to save or N to continue.'
-      input = gets.strip.upcase
-      save = true if input == 'Y'
-      continue = true if input == 'N'
-    end
-    game.save_game if save
-    game.game_saved = false  
-    letter_chosen = game.choose_a_letter
-    game.all_guessed_letters.push(letter_chosen)
-    number_of_hits = game.secret_word.count(letter_chosen)
-    game.score_incorrect_guess(letter_chosen) if number_of_hits == 0
-    game.failed = true if game.guesses_remaining == 0
-    game.score_correct_guess(letter_chosen, number_of_hits) if number_of_hits > 0
-    game.solved = true if game.state_of_word == game.secret_word
-    
-    break if game.solved || game.failed
-   
-    puts "So far we have: #{game.state_of_word} \nand the incorrect #{game.incorrect_guessed_letters.size == 1 ? 'guess is' : 'guesses are'} #{game.incorrect_guessed_letters.join(', ')}"
-    puts "You have #{game.guesses_remaining == 1 ? 'just one incorrect guess remaining!' : "#{game.guesses_remaining} incorrect guesses remaining"}" 
-  end
-
-  sleep(2)
-
-  puts "To play again, #{game.player_name}, press Y."
-  play_hangman(Game.new(game.player_name)) if gets.upcase.strip == 'Y'
-
+puts "Would you like to load a previously saved game? Type Y for yes, anything else to continue."
+if gets.strip.upcase == 'Y' 
+    Game.load_game.play_hangman
+else Game.new.play_hangman
 end
-
-play_hangman(Game.new)
