@@ -7,9 +7,10 @@ class Game
     ALPHA_REGEX = /^[A-Z]$/
     REGEX_ERROR = "Not accepted. Please enter one letter from the alphabet."
     DUP_ERROR = "You've already guessed that letter. Please choose another."
+    MAX_GUESSES = 7
     
     def initialize(name = nil)
-        @guesses_remaining = 7
+        @guesses_remaining = MAX_GUESSES
         @all_guessed_letters = []
         @incorrect_guessed_letters = []
         @state_of_word = ''
@@ -134,8 +135,16 @@ class Game
     end
           
     def display_score
-      puts "So far we have: #{state_of_word} \nand the incorrect #{incorrect_guessed_letters.size == 1 ? 'guess is' : 'guesses are'} #{incorrect_guessed_letters.join(', ')}"
+      puts "So far the secret word looks like: #{state_of_word} \nand #{plural_guesses}"
       puts "You have #{guesses_remaining == 1 ? 'just one incorrect guess remaining!' : "#{guesses_remaining} incorrect guesses remaining"}" 
+    end
+
+    def plural_guesses
+        case guesses_remaining
+          when MAX_GUESSES then 'no incorrect guesses made (yet)!'
+          when MAX_GUESSES - 1 then "one incorrect guess so far: #{incorrect_guessed_letters[0]}"
+          else "incorrect guesses so far: #{incorrect_guessed_letters.join(', ')}"
+        end
     end
       
     def choose_play_again
