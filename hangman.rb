@@ -102,9 +102,9 @@ class Game
     end
 
     def play_hangman
-        start_the_game unless saved
+        start_the_game unless game_saved
           loop do 
-            choose_save unless saved 
+            choose_save unless game_saved 
             # a reloaded game skips those first two parts because it is already saved
             make_a_guess
             break if solved || failed
@@ -115,14 +115,8 @@ class Game
       
     def choose_save
           puts "Would you like to save the game, #{player_name}?"
-          save, continue = false, false
-          until save || continue
-            puts 'Type Y to save or any other key to continue.'
-            input = gets.strip.upcase
-            save = true if input == 'Y'
-            continue = true if input == 'N'
-          end
-          save_game if save
+          puts 'Type Y to save or any other key to continue.'
+          save_game if gets.strip.upcase == 'Y'
     end
           
     def make_a_guess     
