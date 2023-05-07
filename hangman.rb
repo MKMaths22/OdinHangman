@@ -87,7 +87,7 @@ class Game
         (0..secret_word.length - 1).each do |i|
             self.state_of_word[i] = secret_word[i] if secret_word[i] == letter
         end
-        letter_wow = "Well done, the letter #{letter} appears #{plural_times(num)} in the word!"
+        letter_wow = "Well done, the letter #{letter} appears #{plural_times(num)}"
         solved_wow = "The letter #{letter} fills the remaining #{plural_space(num)} and you have solved the word #{@secret_word}. Congratulations, #{@player_name}!"
         puts @state_of_word == @secret_word ? solved_wow : letter_wow
     end
@@ -104,8 +104,7 @@ class Game
         number == 1 ? 'space' : "#{number} spaces"
     end
 
-    def play_hangman(game)
-        p game 
+    def play_hangman(game) 
         game.start_the_game unless game.game_saved
           loop do 
             game.choose_save unless game.game_saved 
