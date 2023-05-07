@@ -28,10 +28,11 @@ class Game
     end
 
     def save_game
-        puts "Game saved. This message is lying until saving actually works."
+        puts "Game saved."
         self.game_saved = true
         saved_game_as_yaml = YAML::dump(self)
-        file_for_saving = File.new('gamesavedhere.txt', 'w')
+        Dir.mkdir("#{player_name}") unless Dir.exists?("#{player_name}")
+        file_for_saving = File.new("#{player_name}/saved_game.txt", 'w')
         file_for_saving.puts saved_game_as_yaml
         file_for_saving.close
     end
@@ -39,7 +40,7 @@ class Game
     def load_game
         file_for_loading = File.open('gamesavedhere.txt', 'r')
         yaml_string = file_for_loading.read
-        file_for_loading.close
+        File.delete(file_for_loading)
         loaded_game = YAML::unsafe_load(yaml_string)
         self.player_name = loaded_game.player_name
         self.all_guessed_letters = loaded_game.all_guessed_letters
@@ -155,7 +156,19 @@ class Game
 
 end
   
-puts "Welcome to Hangman! Would you like to load a previously saved game? Type Y for yes, anything else to continue."
+puts "Welcome to Hangman! What is your name?"
+name = gets.strip.upcase
+# to implement a saved games regieme in which the player is asked at the start
+# of the program for their name. If their name matches a directory of saved games,
+# which has saved games in it already the program displays 'Hey there. I thought 
+# I remembered you! You have saved games available in slots numbered {num_one,
+# num_two ....}. Type one of those numbers to load that game, or anything else
+# to start a new game'.
+# Also when you save, it should automatically find the lowest numbered slot available
+# in your folder, or make the new folder with your name on it.
+# When loading a saved game, it should be deleted.
+
+puts "Would you like to load a previously saved game? Type Y for yes, anything else to continue."
 this_game = Game.new
 if gets.strip.upcase == 'Y' 
     this_game.load_game
