@@ -50,7 +50,7 @@ class Game
         self.solved = loaded_game.solved
         self.failed = loaded_game.failed
         display_score
-        play_hangman
+        play_hangman(self)
     end
 
     def start_the_game
@@ -100,7 +100,7 @@ class Game
         number == 1 ? 'space' : "#{number} spaces"
     end
 
-    def play_hangman
+    def play_hangman(game)
         start_the_game unless game_saved
           loop do 
             choose_save unless game_saved 
@@ -143,8 +143,8 @@ class Game
 end
   
 puts "Welcome to Hangman! Would you like to load a previously saved game? Type Y for yes, anything else to continue."
-
+this_game = Game.new
 if gets.strip.upcase == 'Y' 
-    Game.new.load_game
-else Game.new.play_hangman
+    this_game.load_game
+else this_game.play_hangman(this_game)
 end
