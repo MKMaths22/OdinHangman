@@ -40,14 +40,24 @@ class Game
         file_for_loading = File.open('gamesavedhere.txt', 'r')
         yaml_string = file_for_loading.read
         file_for_loading.close
-        YAML::load(yaml_string)
+        loaded_game = YAML::unsafe_load(yaml_string)
+        self.player_name = loaded_game.player_name
+        self.all_guessed_letters = loaded_game.all_guessed_letters
+        self.guesses_remaining = loaded_game.guesses_remaining
+        self.incorrect_guessed_letters = loaded_game.incorrect_guessed_letters
+        self.state_of_word = loaded_game.state_of_word
+        self.secret_word = loaded_game.secret_word
+        self.game_saved = loaded_game.game_saved
+        self.solved = loaded_game.solved
+        self.failed = loaded_game.failed
+        p self
         play_hangman
     end
 
     def start_the_game
         self.secret_word = find_random_word
         size = @secret_word.length
-        puts "Welcome to Hangman. What is your name?" unless @player_name
+        puts "What is your name?" unless @player_name
         self.player_name = gets.strip unless @player_name
         puts "The computer has chosen a secret word with #{size} letters. Can you solve it, #{@player_name}?"
         self.state_of_word = '------------'[0,size]
@@ -92,44 +102,55 @@ class Game
     end
 
     def play_hangman
-        start_the_game
+        start_the_game unless saved
+          loop do 
+            choose_save unless saved 
+            # a reloaded game skips those first two parts because it is already saved
+            make_a_guess
+            break if solved || failed
+            display_score
+            end 
+          choose_play_again
+    end
       
-        loop do
-          puts "Would you like to save the game, #{player_name}?" unless game_saved
+    def choose_save
+          puts "Would you like to save the game, #{player_name}?"
           save, continue = false, false
           until save || continue
-            puts 'Type Y to save or N to continue.'
+            puts 'Type Y to save or any other key to continue.'
             input = gets.strip.upcase
             save = true if input == 'Y'
             continue = true if input == 'N'
           end
           save_game if save
-          self.game_saved = false  
-          letter_chosen = choose_a_letter
-          self.all_guessed_letters.push(letter_chosen)
-          number_of_hits = secret_word.count(letter_chosen)
-          score_incorrect_guess(letter_chosen) if number_of_hits == 0
-          self.failed = true if guesses_remaining == 0
-          score_correct_guess(letter_chosen, number_of_hits) if number_of_hits > 0
-          self.solved = true if state_of_word == secret_word
+    end
           
-          break if solved || failed
-         
-          puts "So far we have: #{state_of_word} \nand the incorrect #{incorrect_guessed_letters.size == 1 ? 'guess is' : 'guesses are'} #{incorrect_guessed_letters.join(', ')}"
-          puts "You have #{guesses_remaining == 1 ? 'just one incorrect guess remaining!' : "#{guesses_remaining} incorrect guesses remaining"}" 
-        end
+    def make_a_guess     
+      self.game_saved = false  
+      letter_chosen = choose_a_letter
+      self.all_guessed_letters.push(letter_chosen)
+      number_of_hits = secret_word.count(letter_chosen)
+      score_incorrect_guess(letter_chosen) if number_of_hits == 0
+      self.failed = true if guesses_remaining == 0
+      score_correct_guess(letter_chosen, number_of_hits) if number_of_hits > 0
+      self.solved = true if state_of_word == secret_word
+    end
+          
+    def display_score
+      puts "So far we have: #{state_of_word} \nand the incorrect #{incorrect_guessed_letters.size == 1 ? 'guess is' : 'guesses are'} #{incorrect_guessed_letters.join(', ')}"
+      puts "You have #{guesses_remaining == 1 ? 'just one incorrect guess remaining!' : "#{guesses_remaining} incorrect guesses remaining"}" 
+    end
       
+    def choose_play_again
         sleep(2)
-      
         puts "To play again, #{player_name}, press Y."
         play_hangman(Game.new(player_name)) if gets.upcase.strip == 'Y'
-      
     end
 
 end
   
-puts "Would you like to load a previously saved game? Type Y for yes, anything else to continue."
+puts "Welcome to Hangman! Would you like to load a previously saved game? Type Y for yes, anything else to continue."
 if gets.strip.upcase == 'Y' 
-    Game.new.play_hangman
-else Game.new.load_game
+    Game.new.load_game
+else Game.new.play_hangman
 end
