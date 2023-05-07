@@ -18,7 +18,6 @@ class Game
         @game_saved = false
         @solved = false
         @failed = false
-
     end
 
     def find_random_word
@@ -50,7 +49,7 @@ class Game
         self.game_saved = loaded_game.game_saved
         self.solved = loaded_game.solved
         self.failed = loaded_game.failed
-        p self
+        display_score
         play_hangman
     end
 
@@ -144,7 +143,8 @@ class Game
 end
   
 puts "Welcome to Hangman! Would you like to load a previously saved game? Type Y for yes, anything else to continue."
+this_game = Game.new
 if gets.strip.upcase == 'Y' 
-    Game.new.load_game
-else Game.new.play_hangman
+    this_game.load_game
+else this_game.play_hangman
 end
