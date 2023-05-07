@@ -93,7 +93,11 @@ class Game
     end
 
     def plural_times(number)
-        number == 1 ? 'once' : "#{number} times"
+        case number
+          when 1 then 'once in the word.'
+          when 2 then 'twice in the word!'
+          else then "#{number} times in the word!"
+        end
     end
 
     def plural_space(number)
@@ -101,15 +105,16 @@ class Game
     end
 
     def play_hangman(game)
-        start_the_game unless game_saved
+        p game 
+        game.start_the_game unless game.game_saved
           loop do 
-            choose_save unless game_saved 
+            game.choose_save unless game.game_saved 
             # a reloaded game skips those first two parts because it is already saved
-            make_a_guess
-            break if solved || failed
-            display_score
-            end 
-          choose_play_again
+            game.make_a_guess
+            break if game.solved || game.failed
+            game.display_score
+          end 
+          game.choose_play_again
     end
       
     def choose_save
