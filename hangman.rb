@@ -143,8 +143,8 @@ class Game
 end
   
 puts "Welcome to Hangman! Would you like to load a previously saved game? Type Y for yes, anything else to continue."
-this_game = Game.new
+
 if gets.strip.upcase == 'Y' 
-    this_game.load_game
-else this_game.play_hangman
+    Game.new.load_game
+else Game.new.play_hangman
 end
