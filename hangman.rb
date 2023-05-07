@@ -96,7 +96,7 @@ class Game
         case number
           when 1 then 'once in the word.'
           when 2 then 'twice in the word!'
-          else then "#{number} times in the word!"
+          else "#{number} times in the word!"
         end
     end
 
