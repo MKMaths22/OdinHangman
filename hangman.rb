@@ -167,7 +167,7 @@ def choose_reload(game,name)
     game_or_games = slots_used.size > 1 ? "saved games" : "a saved game"
     puts "I have found #{game_or_games} of yours, numbered as follows:"
     puts slots_used.join(', ') << '.'
-    puts "To load a game, enter its number. Press anything else to start a new game."
+    puts "To load a game (which also clears the save slot), enter its number. Press anything else to start a new game."
     input = gets.strip
     Dir.chdir("..")
     slots_used.include?(input) ? game.load_game(name, input) : game.play_hangman(game)
