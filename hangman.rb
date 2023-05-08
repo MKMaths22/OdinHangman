@@ -9,7 +9,7 @@ class Game
     DUP_ERROR = "You've already guessed that letter. Please choose another."
     MAX_GUESSES = 7
     
-    def initialize(name = nil)
+    def initialize(name)
         @guesses_remaining = MAX_GUESSES
         @all_guessed_letters = []
         @incorrect_guessed_letters = []
@@ -170,14 +170,14 @@ def choose_reload(name)
     puts slots_used.join(', ') << '.'
     puts "To load a game, enter its number. Press anything else to start a new game."
     input = gets.strip
-    slots_used.include?(input) ? this_game.load_game(input) : this_game.play_hangman(this_game)
+    slots_used.include?(input) ? game.load_game(input) : game.play_hangman(game)
 end
 
 puts "Welcome to Hangman! What is your name?"
 name = gets.strip
-this_game = Game.new(name)
+game = Game.new(name)
 puts "Nice to see you again, #{name}!" if Dir.exists?(name)
-Dir.exists?(name) && !Dir.empty?(name) ? choose_reload(name) : this_game.play_hangman(this_game)
+Dir.exists?(name) && !Dir.empty?(name) ? choose_reload(name) : game.play_hangman(game)
 
 # to implement a saved games regieme in which the player is asked at the start
 # of the program for their name. If their name matches a directory of saved games,
