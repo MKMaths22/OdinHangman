@@ -47,14 +47,14 @@ class Game
         i = 1
         i += 1 while File.exists?("#{player_name}/#{i.to_s}.txt")
         file_for_saving = File.new("#{player_name}/#{i.to_s}.txt", 'w')
-        puts "Game  in your named folder, in slot #{i.to_s}."
-        file_for_saving.puts _game_as_yaml
+        puts "Game saved in your named folder, in slot #{i.to_s}."
+        file_for_saving.puts saved_game_as_yaml
         file_for_saving.close
     end
     
     def determine_if_saves_exist(name)
       puts "Nice to see you again, #{name}!" if Dir.exists?(name)
-      Dir.exists?(name) && !Dir.empty?(name) ? choose_reload(self,name) : game.play_hangman(self)
+      Dir.exists?(name) && !Dir.empty?(name) ? choose_reload(name) : play_hangman
     end 
     
     def load_game(player_name, number_string)
@@ -71,7 +71,7 @@ class Game
         self.solved = loaded_game.solved
         self.failed = loaded_game.failed
         display_score
-        play_hangman(self)
+        play_hangman
     end
 
     def start_the_game
@@ -142,8 +142,7 @@ class Game
           save_game if gets.strip.upcase == 'Y'
     end
           
-    def make_a_guess     
-      self.game_ = false  
+    def make_a_guess
       letter_chosen = choose_a_letter
       self.all_guessed_letters.push(letter_chosen)
       number_of_hits = secret_word.count(letter_chosen)
