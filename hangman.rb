@@ -28,7 +28,6 @@ class Game
     end
 
     def save_game
-        puts "Game saved."
         self.game_saved = true
         saved_game_as_yaml = YAML::dump(self)
         Dir.mkdir("#{player_name}") unless Dir.exists?("#{player_name}")
@@ -37,13 +36,13 @@ class Game
         i = 1
         i += 1 while File.exists?("#{player_name}/#{i.to_s}.txt")
         file_for_saving = File.new("#{player_name}/#{i.to_s}.txt", 'w')
+        puts "Game saved in your named folder, in slot #{i.to_s}."
         file_for_saving.puts saved_game_as_yaml
         file_for_saving.close
     end
 
-    def load_game(number_string)
-        # the program will already be in the directory of the player's name
-        file_for_loading = File.open("#{number_string}.txt", 'r')
+    def load_game(player_name, number_string)
+        file_for_loading = File.open("#{player_name}/#{number_string}.txt", 'r')
         yaml_string = file_for_loading.read
         File.delete(file_for_loading)
         loaded_game = YAML::unsafe_load(yaml_string)
@@ -125,7 +124,7 @@ class Game
       
     def choose_save
           puts "Would you like to save the game, #{player_name}?"
-          puts 'Type Y to save or any other key to continue.'
+          puts 'Type Y to save or anything else to continue.'
           save_game if gets.strip.upcase == 'Y'
     end
           
@@ -161,7 +160,7 @@ class Game
 
 end
   
-def choose_reload(name)
+def choose_reload(game,name)
     Dir.chdir(name)
     slots_used = Dir["./*"].map { |string| string[2..-5]}
     # removes "./" and ".txt" and outputs array of numbers as strings only
@@ -170,14 +169,15 @@ def choose_reload(name)
     puts slots_used.join(', ') << '.'
     puts "To load a game, enter its number. Press anything else to start a new game."
     input = gets.strip
-    slots_used.include?(input) ? game.load_game(input) : game.play_hangman(game)
+    Dir.chdir("..")
+    slots_used.include?(input) ? game.load_game(name, input) : game.play_hangman(game)
 end
 
 puts "Welcome to Hangman! What is your name?"
 name = gets.strip
 game = Game.new(name)
 puts "Nice to see you again, #{name}!" if Dir.exists?(name)
-Dir.exists?(name) && !Dir.empty?(name) ? choose_reload(name) : game.play_hangman(game)
+Dir.exists?(name) && !Dir.empty?(name) ? choose_reload(game,name) : game.play_hangman(game)
 
 # to implement a saved games regieme in which the player is asked at the start
 # of the program for their name. If their name matches a directory of saved games,
