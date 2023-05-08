@@ -2,7 +2,7 @@ require 'yaml'
 
 class Game
     
-    attr_accessor :guesses_remaining, :all_guessed_letters, :incorrect_guessed_letters, :state_of_word, :secret_word, :player_name, :game_saved, :solved, :failed
+    attr_accessor :guesses_remaining, :all_guessed_letters, :incorrect_guessed_letters, :state_of_word, :secret_word, :player_name, :game_saved, :solved, :failed, :saved, :save_slot
     
     ALPHA_REGEX = /^[A-Z]$/
     REGEX_ERROR = "Not accepted. Please enter one letter from the alphabet."
@@ -18,6 +18,10 @@ class Game
         @player_name = name
         @solved = false
         @failed = false
+        @saved = false
+        @save_slot = nil
+        # when the game is saved, it's save_slot is stored as a positive integer
+        # when resumed, the game, if saved again, is saved back to the same slot
     end
 
     def choose_reload(name)
@@ -27,7 +31,7 @@ class Game
         game_or_games = slots_used.size > 1 ? "saved games" : "a saved game"
         puts "I have found #{game_or_games} of yours, numbered as follows:"
         puts slots_used.join(', ') << '.'
-        puts "To load a game (which also clears the save slot), enter its number. Press anything else to start a new game."
+        puts "To resume a game, enter its number. Press anything else to start a new game."
         input = gets.strip
         Dir.chdir("..")
         slots_used.include?(input) ? load_game(name, input) : play_hangman
@@ -42,14 +46,27 @@ class Game
     def save_game
         saved_game_as_yaml = YAML::dump(self)
         Dir.mkdir("#{player_name}") unless Dir.exists?("#{player_name}")
-        # needs to check for indices of games already saved and use
-        # the smallest positive integer value that doesn't alreay exist
-        i = 1
-        i += 1 while File.exists?("#{player_name}/#{i.to_s}.txt")
-        file_for_saving = File.new("#{player_name}/#{i.to_s}.txt", 'w')
-        puts "Game saved in your named folder, in slot #{i.to_s}."
+        # if game was previously saved and resumed it uses the same slot again
+        
+          if save_slot
+            saved_game_as_yaml = YAML::dump(self)
+            file_for_saving = File.new("#{player_name}/#{save_slot.to_s}.txt", 'w')
+            puts "Game saved in your named folder, back into slot #{save_slot.to_s}"
+          else 
+            # needs to check for indices of games already saved and use
+            # the smallest positive integer value that doesn't alreay exist
+            i = 1
+            i += 1 while File.exists?("#{player_name}/#{i.to_s}.txt")
+            save_slot = i
+            saved_game_as_yaml = YAML::dump(self)
+            file_for_saving = File.new("#{player_name}/#{i.to_s}.txt", 'w')
+            puts "Game saved in your named folder, in slot #{i.to_s}."
+          end 
+        
         file_for_saving.puts saved_game_as_yaml
         file_for_saving.close
+        self.saved = true
+        # this will stop play_hangman from continuing to execute its 'do' loop 
     end
     
     def determine_if_saves_exist(name)
@@ -70,6 +87,8 @@ class Game
         self.secret_word = loaded_game.secret_word
         self.solved = loaded_game.solved
         self.failed = loaded_game.failed
+        self.save_slot = loaded_game.save_slot
+        self.saved = loaded_game.saved
         display_score
         play_hangman
     end
@@ -77,8 +96,6 @@ class Game
     def start_the_game
         self.secret_word = find_random_word
         size = @secret_word.length
-        puts "What is your name?" unless @player_name
-        self.player_name = gets.strip unless @player_name
         puts "The computer has chosen a secret word with #{size} letters. Can you solve it, #{@player_name}?"
         self.state_of_word = '------------'[0,size]
         puts "Secret word: #{@state_of_word}"
@@ -100,16 +117,20 @@ class Game
         self.guesses_remaining -= 1
         self.incorrect_guessed_letters.push(letter)
         letter_fail = "Hard luck, the letter #{letter} does not appear in the word."
-        solved_fail = "The letter #{letter} does not appear, and that was your last mistake. You have lost the game, #{@player_name} - the word was #{@secret_word}."
+        solved_fail = "The letter #{letter} does not appear, and that was your last mistake. You have lost the game, #{@player_name} - the word was #{@secret_word}.\n\n#{play_again(player_name)}"
         puts @guesses_remaining == 0 ? solved_fail : letter_fail
     end
 
+    def play_again(name)
+        "Would you like to play another game, #{name}?"
+    end 
+    
     def score_correct_guess(letter, num)
         (0..secret_word.length - 1).each do |i|
             self.state_of_word[i] = secret_word[i] if secret_word[i] == letter
         end
         letter_wow = "Well done, the letter #{letter} appears #{plural_times(num)}"
-        solved_wow = "The letter #{letter} fills the remaining #{plural_space(num)} and you have solved the word #{@secret_word}. Congratulations, #{@player_name}!"
+        solved_wow = "The letter #{letter} fills the remaining #{plural_space(num)} and you have solved the word #{@secret_word}. Congratulations, #{@player_name}!\n\n#{play_again(player_name)}"
         puts @state_of_word == @secret_word ? solved_wow : letter_wow
     end
 
@@ -129,10 +150,12 @@ class Game
         start_the_game
           loop do 
             choose_save
+            break if saved
             make_a_guess
             break if solved || failed
             display_score
-          end 
+          end
+          self.saved = false
           choose_reload(name)
     end
       
