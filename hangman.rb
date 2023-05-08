@@ -32,7 +32,11 @@ class Game
         self.game_saved = true
         saved_game_as_yaml = YAML::dump(self)
         Dir.mkdir("#{player_name}") unless Dir.exists?("#{player_name}")
-        file_for_saving = File.new("#{player_name}/saved_game.txt", 'w')
+        # needs to check for indices of games already saved and use
+        # the smallest positive integer value that doesn't alreay exist
+        i = 1
+        i += 1 while File.exists?("#{player_name}/#{i.to_s}.txt")
+        file_for_saving = File.new("#{player_name}/#{i.to_s}.txt", 'w')
         file_for_saving.puts saved_game_as_yaml
         file_for_saving.close
     end
@@ -157,7 +161,14 @@ class Game
 end
   
 puts "Welcome to Hangman! What is your name?"
-name = gets.strip.upcase
+name = gets.strip
+puts "Nice to see you again, #{name}!" if Dir.exists?(name)
+if Dir.exists?(name) && !Dir.empty?(name) ? choose_reload(name) : start_new_game(name)
+
+def choose_reload(name)
+  puts "I have found saved game(s) of yours."
+end
+
 # to implement a saved games regieme in which the player is asked at the start
 # of the program for their name. If their name matches a directory of saved games,
 # which has saved games in it already the program displays 'Hey there. I thought 
@@ -168,9 +179,7 @@ name = gets.strip.upcase
 # in your folder, or make the new folder with your name on it.
 # When loading a saved game, it should be deleted.
 
-puts "Would you like to load a previously saved game? Type Y for yes, anything else to continue."
-this_game = Game.new
-if gets.strip.upcase == 'Y' 
-    this_game.load_game
-else this_game.play_hangman(this_game)
+def start_new_game(name) 
+  this_game = Game.new(name)
+  this_game.play_hangman(this_game)
 end
