@@ -57,7 +57,7 @@ class Game
             # the smallest positive integer value that doesn't alreay exist
             i = 1
             i += 1 while File.exists?("#{player_name}/#{i.to_s}.txt")
-            save_slot = i
+            self.save_slot = i
             saved_game_as_yaml = YAML::dump(self)
             file_for_saving = File.new("#{player_name}/#{i.to_s}.txt", 'w')
             puts "Game saved in your named folder, in slot #{i.to_s}."
