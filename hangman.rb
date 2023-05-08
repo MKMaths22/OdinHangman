@@ -21,6 +21,19 @@ class Game
         @failed = false
     end
 
+    def choose_reload(name)
+        Dir.chdir(name)
+        slots_used = Dir["./*"].map { |string| string[2..-5]}
+        # removes "./" and ".txt" and outputs array of numbers as strings only
+        game_or_games = slots_used.size > 1 ? "saved games" : "a saved game"
+        puts "I have found #{game_or_games} of yours, numbered as follows:"
+        puts slots_used.join(', ') << '.'
+        puts "To load a game (which also clears the save slot), enter its number. Press anything else to start a new game."
+        input = gets.strip
+        Dir.chdir("..")
+        slots_used.include?(input) ? load_game(name, input) : play_hangman
+    end
+    
     def find_random_word
         dictionary = File.open('edited_word_list.txt', 'r')
         return dictionary.readlines.sample.upcase.chomp
@@ -40,7 +53,12 @@ class Game
         file_for_saving.puts saved_game_as_yaml
         file_for_saving.close
     end
-
+    
+    def determine_if_saves_exist(name)
+      puts "Nice to see you again, #{name}!" if Dir.exists?(name)
+      Dir.exists?(name) && !Dir.empty?(name) ? choose_reload(self,name) : game.play_hangman(self)
+    end 
+    
     def load_game(player_name, number_string)
         file_for_loading = File.open("#{player_name}/#{number_string}.txt", 'r')
         yaml_string = file_for_loading.read
@@ -110,16 +128,16 @@ class Game
         number == 1 ? 'space' : "#{number} spaces"
     end
 
-    def play_hangman(game) 
-        game.start_the_game unless game.game_saved
+    def play_hangman 
+        start_the_game unless game_saved
           loop do 
-            game.choose_save unless game.game_saved 
+            choose_save unless game_saved 
             # a reloaded game skips those first two parts because it is already saved
-            game.make_a_guess
-            break if game.solved || game.failed
-            game.display_score
+            make_a_guess
+            break if solved || failed
+            display_score
           end 
-          game.choose_play_again
+          choose_reload(name)
     end
       
     def choose_save
@@ -151,33 +169,13 @@ class Game
           else "incorrect guesses so far: #{incorrect_guessed_letters.join(', ')}"
         end
     end
-      
-    def choose_play_again
-        sleep(2)
-        puts "To play again, #{player_name}, press Y."
-        play_hangman(Game.new(player_name)) if gets.upcase.strip == 'Y'
-    end
 
 end
   
-def choose_reload(game,name)
-    Dir.chdir(name)
-    slots_used = Dir["./*"].map { |string| string[2..-5]}
-    # removes "./" and ".txt" and outputs array of numbers as strings only
-    game_or_games = slots_used.size > 1 ? "saved games" : "a saved game"
-    puts "I have found #{game_or_games} of yours, numbered as follows:"
-    puts slots_used.join(', ') << '.'
-    puts "To load a game (which also clears the save slot), enter its number. Press anything else to start a new game."
-    input = gets.strip
-    Dir.chdir("..")
-    slots_used.include?(input) ? game.load_game(name, input) : game.play_hangman(game)
-end
-
 puts "Welcome to Hangman! What is your name?"
 name = gets.strip
 game = Game.new(name)
-puts "Nice to see you again, #{name}!" if Dir.exists?(name)
-Dir.exists?(name) && !Dir.empty?(name) ? choose_reload(game,name) : game.play_hangman(game)
+game.determine_if_saves_exist(name)
 
 # to implement a saved games regieme in which the player is asked at the start
 # of the program for their name. If their name matches a directory of saved games,
