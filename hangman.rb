@@ -20,6 +20,7 @@ class Game
         @failed = false
         @saved = false
         @save_slot = nil
+        @reloaded = false
         # when the game is saved, it's save_slot is stored as a positive integer
         # when resumed, the game, if saved again, is saved back to the same slot
     end
@@ -66,7 +67,8 @@ class Game
         file_for_saving.puts saved_game_as_yaml
         file_for_saving.close
         self.saved = true
-        # this will stop play_hangman from continuing to execute its 'do' loop 
+        # this will stop play_hangman from continuing to execute its 'do' loop
+        # but does not affect the game that will be reloaded
     end
     
     def determine_if_saves_exist(name)
@@ -89,6 +91,8 @@ class Game
         self.failed = loaded_game.failed
         self.save_slot = loaded_game.save_slot
         self.saved = loaded_game.saved
+        self.reloaded = true
+        # extra variable reloaded prevents a new game from being started by play_hangman
         display_score
         play_hangman
     end
@@ -154,8 +158,9 @@ class Game
     end
 
     def play_hangman 
-        start_the_game unless save_slot
+        start_the_game unless reloaded
         # so that reloaded games don't choose a new secret word but enter the do loop
+        self.reloaded = false
           loop do 
             choose_save
             break if saved
