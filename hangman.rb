@@ -147,16 +147,17 @@ class Game
     end
 
     def play_hangman 
-        start_the_game
+        start_the_game unless save_slot
+        # so that reloaded games don't choose a new secret word but enter the do loop
           loop do 
             choose_save
             break if saved
             make_a_guess
             break if solved || failed
             display_score
+            self.saved = false
           end
-          self.saved = false
-          choose_reload(name)
+          choose_reload(player_name)
     end
       
     def choose_save
