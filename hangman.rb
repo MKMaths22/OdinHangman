@@ -16,7 +16,6 @@ class Game
         @state_of_word = ''
         @secret_word = ''
         @player_name = name
-        @game_saved = false
         @solved = false
         @failed = false
     end
@@ -41,7 +40,6 @@ class Game
     end
 
     def save_game
-        self.game_saved = true
         saved_game_as_yaml = YAML::dump(self)
         Dir.mkdir("#{player_name}") unless Dir.exists?("#{player_name}")
         # needs to check for indices of games already saved and use
@@ -49,8 +47,8 @@ class Game
         i = 1
         i += 1 while File.exists?("#{player_name}/#{i.to_s}.txt")
         file_for_saving = File.new("#{player_name}/#{i.to_s}.txt", 'w')
-        puts "Game saved in your named folder, in slot #{i.to_s}."
-        file_for_saving.puts saved_game_as_yaml
+        puts "Game  in your named folder, in slot #{i.to_s}."
+        file_for_saving.puts _game_as_yaml
         file_for_saving.close
     end
     
@@ -70,7 +68,6 @@ class Game
         self.incorrect_guessed_letters = loaded_game.incorrect_guessed_letters
         self.state_of_word = loaded_game.state_of_word
         self.secret_word = loaded_game.secret_word
-        self.game_saved = loaded_game.game_saved
         self.solved = loaded_game.solved
         self.failed = loaded_game.failed
         display_score
@@ -129,10 +126,9 @@ class Game
     end
 
     def play_hangman 
-        start_the_game unless game_saved
+        start_the_game
           loop do 
-            choose_save unless game_saved 
-            # a reloaded game skips those first two parts because it is already saved
+            choose_save
             make_a_guess
             break if solved || failed
             display_score
@@ -147,7 +143,7 @@ class Game
     end
           
     def make_a_guess     
-      self.game_saved = false  
+      self.game_ = false  
       letter_chosen = choose_a_letter
       self.all_guessed_letters.push(letter_chosen)
       number_of_hits = secret_word.count(letter_chosen)
@@ -179,7 +175,7 @@ game.determine_if_saves_exist(name)
 
 # to implement a saved games regieme in which the player is asked at the start
 # of the program for their name. If their name matches a directory of saved games,
-# which has saved games in it already the program displays 'Hey there. I thought 
+# which has  games in it already the program displays 'Hey there. I thought 
 # I remembered you! You have saved games available in slots numbered {num_one,
 # num_two ....}. Type one of those numbers to load that game, or anything else
 # to start a new game'.
