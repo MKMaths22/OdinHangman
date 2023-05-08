@@ -41,8 +41,9 @@ class Game
         file_for_saving.close
     end
 
-    def load_game
-        file_for_loading = File.open('gamesavedhere.txt', 'r')
+    def load_game(number_string)
+        # the program will already be in the directory of the player's name
+        file_for_loading = File.open("#{number_string}.txt", 'r')
         yaml_string = file_for_loading.read
         File.delete(file_for_loading)
         loaded_game = YAML::unsafe_load(yaml_string)
@@ -160,14 +161,23 @@ class Game
 
 end
   
+def choose_reload(name)
+    Dir.chdir(name)
+    slots_used = Dir["./*"].map { |string| string[2..-5]}
+    # removes "./" and ".txt" and outputs array of numbers as strings only
+    game_or_games = slots_used.size > 1 ? "saved games" : "a saved game"
+    puts "I have found #{game_or_games} of yours, numbered as follows:"
+    puts slots_used.join(', ') << '.'
+    puts "To load a game, enter its number. Press anything else to start a new game."
+    input = gets.strip
+    slots_used.include?(input) ? this_game.load_game(input) : this_game.play_hangman(this_game)
+end
+
 puts "Welcome to Hangman! What is your name?"
 name = gets.strip
+this_game = Game.new(name)
 puts "Nice to see you again, #{name}!" if Dir.exists?(name)
-if Dir.exists?(name) && !Dir.empty?(name) ? choose_reload(name) : start_new_game(name)
-
-def choose_reload(name)
-  puts "I have found saved game(s) of yours."
-end
+Dir.exists?(name) && !Dir.empty?(name) ? choose_reload(name) : this_game.play_hangman(this_game)
 
 # to implement a saved games regieme in which the player is asked at the start
 # of the program for their name. If their name matches a directory of saved games,
@@ -178,8 +188,3 @@ end
 # Also when you save, it should automatically find the lowest numbered slot available
 # in your folder, or make the new folder with your name on it.
 # When loading a saved game, it should be deleted.
-
-def start_new_game(name) 
-  this_game = Game.new(name)
-  this_game.play_hangman(this_game)
-end
