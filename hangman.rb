@@ -2,7 +2,7 @@ require 'yaml'
 
 class Game
     
-    attr_accessor :guesses_remaining, :all_guessed_letters, :incorrect_guessed_letters, :state_of_word, :secret_word, :player_name, :game_saved, :solved, :failed, :saved, :save_slot
+    attr_accessor :guesses_remaining, :all_guessed_letters, :incorrect_guessed_letters, :state_of_word, :secret_word, :player_name, :game_saved, :solved, :failed, :saved, :save_slot, :reloaded
     
     ALPHA_REGEX = /^[A-Z]$/
     REGEX_ERROR = "Not accepted. Please enter one letter from the alphabet."
