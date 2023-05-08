@@ -94,6 +94,13 @@ class Game
     end
 
     def start_the_game
+        self.guesses_remaining = MAX_GUESSES
+        self.all_guessed_letters = []
+        self.incorrect_guessed_letters = []
+        self.solved = false
+        self.failed = false
+        self.saved = false
+        self.save_slot = nil
         self.secret_word = find_random_word
         size = @secret_word.length
         puts "The computer has chosen a secret word with #{size} letters. Can you solve it, #{@player_name}?"
