@@ -113,7 +113,7 @@ class Game
     end
     
     def choose_a_letter
-        puts "#{@player_name}, pick a letter you think might be in the word. You have #{@guesses_remaining} incorrect guesses remaining."
+        puts "#{@player_name}, pick a letter you think might be in the word."
           valid = 0
           until valid == 2
             valid = 0
@@ -189,15 +189,15 @@ class Game
     end
           
     def display_score
-      puts "So far the secret word looks like: #{state_of_word} \nand #{plural_guesses}"
+      puts "Your knowledge of the secret word so far is: #{state_of_word} \nand #{plural_guesses}"
       puts "You have #{guesses_remaining == 1 ? 'just one incorrect guess remaining!' : "#{guesses_remaining} incorrect guesses remaining"}" 
     end
 
     def plural_guesses
         case guesses_remaining
           when MAX_GUESSES then 'no incorrect guesses made (yet)!'
-          when MAX_GUESSES - 1 then "one incorrect guess so far: #{incorrect_guessed_letters[0]}"
-          else "incorrect guesses so far: #{incorrect_guessed_letters.join(', ')}"
+          when MAX_GUESSES - 1 then "just one incorrect guess made: #{incorrect_guessed_letters[0]}"
+          else "incorrect guesses made: #{incorrect_guessed_letters.join(', ')}"
         end
     end
 
