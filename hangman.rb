@@ -58,7 +58,8 @@ class Game
   def save_game
     Dir.mkdir("#{player_name}") unless Dir.exists?("#{player_name}")
     # make the player's own directory if it does not exist
-    saved_back_to = "Game saved in your named folder, back into slot #{save_slot.to_s}" save_slot ? (puts saved_back_to) : find_save_slot
+    saved_back_to = "Game saved in your named folder, back into slot #{save_slot.to_s}" 
+    save_slot ? (puts saved_back_to) : find_save_slot
     # whether save_slot already existed, we have one now and have puts 'game saved' etc.
     saved_game_as_yaml = YAML::dump(self)
     file_for_saving = File.new("#{player_name}/#{save_slot.to_s}.txt", 'w')
