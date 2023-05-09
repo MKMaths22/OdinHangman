@@ -132,8 +132,8 @@ class Game
     end
 
     def play_again(name)
-        puts "Would you like to start another game, #{name}?\n
-        Press Y to play again, or anything else to stop."
+        puts "What would you like, #{name}?\n
+        Press Y to play some more, or anything else to stop."
         gets.strip.upcase == 'Y' ? find_if_saves_exist(name) : bye(name)
     end 
     
