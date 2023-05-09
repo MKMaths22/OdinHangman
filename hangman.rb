@@ -105,7 +105,7 @@ class Game
     self.save_slot = nil
     self.secret_word = find_random_word
     size = @secret_word.length
-    puts "\n-------NEW GAME-------\nThe computer has chosen a secret word with #{size}  letters. Can you solve it, #{@player_name}?"
+    puts "\n-------NEW GAME-------\nThe computer has chosen a secret word with #{size} letters. Can you solve it, #{@player_name}?"
     self.state_of_word = '------------'[0,size]
     puts "Secret word: #{@state_of_word}"
   end
