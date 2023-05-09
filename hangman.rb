@@ -1,5 +1,7 @@
 require 'yaml'
 
+# class Game includes all relevant methods and variables for playing after the edited
+# word list is made by first running dictionary.rb with the file google-10000-no-swears.# txt in the same directory
 class Game
 
   attr_accessor :guesses_remaining, :all_guessed_letters, :incorrect_guessed_letters, :state_of_word, :secret_word, :player_name, :game_saved, :solved, :failed, :saved, :save_slot, :reloaded
@@ -43,34 +45,30 @@ class Game
     return dictionary.readlines.sample.upcase.chomp
     dictionary.close
   end
+  
+  def find_save_slot
+    # needs to check for indices of games already saved and use
+    # the smallest positive integer value that doesn't alreay exist
+    i = 1
+    i += 1 while File.exists?("#{player_name}/#{i.to_s}.txt")
+    puts "Game saved in your named folder, in slot #{i.to_s}."
+    self.save_slot = i
+  end
 
   def save_game
-    saved_game_as_yaml = YAML::dump(self)
     Dir.mkdir("#{player_name}") unless Dir.exists?("#{player_name}")
-    # if game was previously saved and resumed it uses the same slot again
-   
-      if save_slot
-        saved_game_as_yaml = YAML::dump(self)
-        file_for_saving = File.new("#{player_name}/#{save_slot.to_s}.txt", 'w')
-        puts "Game saved in your named folder, back into slot #{save_slot.to_s}"
-      else
-        # needs to check for indices of games already saved and use
-        # the smallest positive integer value that doesn't alreay exist
-        i = 1
-        i += 1 while File.exists?("#{player_name}/#{i.to_s}.txt")
-        self.save_slot = i
-        saved_game_as_yaml = YAML::dump(self)
-        file_for_saving = File.new("#{player_name}/#{i.to_s}.txt", 'w')
-        puts "Game saved in your named folder, in slot #{i.to_s}."
-      end 
-        
+    # make the player's own directory if it does not exist
+    saved_back_to = "Game saved in your named folder, back into slot #{save_slot.to_s}" save_slot ? (puts saved_back_to) : find_save_slot
+    # whether save_slot already existed, we have one now and have puts 'game saved' etc.
+    saved_game_as_yaml = YAML::dump(self)
+    file_for_saving = File.new("#{player_name}/#{save_slot.to_s}.txt", 'w')
     file_for_saving.puts saved_game_as_yaml
     file_for_saving.close
     self.saved = true
     # this will stop play_hangman from continuing to execute its 'do' loop
     # but does not affect the game that will be reloaded
   end
-    
+  
   def find_if_saves_exist(name)
     Dir.exists?(name) && !Dir.empty?(name) ? choose_reload(name) : play_hangman
   end 
