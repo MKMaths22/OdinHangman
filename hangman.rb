@@ -127,12 +127,14 @@ class Game
         self.guesses_remaining -= 1
         self.incorrect_guessed_letters.push(letter)
         letter_fail = "Hard luck, the letter #{letter} does not appear in the word."
-        solved_fail = "The letter #{letter} does not appear, and that was your last mistake. You have lost the game, #{@player_name} - the word was #{@secret_word}.\n\n#{play_again(player_name)}"
+        solved_fail = "The letter #{letter} does not appear, and that was your last mistake. You have lost the game, #{@player_name} - the word was #{@secret_word}.\n\n"
         puts @guesses_remaining == 0 ? solved_fail : letter_fail
     end
 
     def play_again(name)
-        "Would you like to play another game, #{name}?"
+        "Would you like to start another game, #{name}?\n
+        Press Y to play again, or anything else to stop."
+        gets.strip.upcase == 'Y' ? find_if_saves_exist(name) : bye(name)
     end 
     
     def score_correct_guess(letter, num)
@@ -140,7 +142,7 @@ class Game
             self.state_of_word[i] = secret_word[i] if secret_word[i] == letter
         end
         letter_wow = "Well done, the letter #{letter} appears #{plural_times(num)}"
-        solved_wow = "The letter #{letter} fills the remaining #{plural_space(num)} and you have solved the word #{@secret_word}. Congratulations, #{@player_name}!\n\n#{play_again(player_name)}"
+        solved_wow = "The letter #{letter} fills the remaining #{plural_space(num)} and you have solved the word #{@secret_word}. Congratulations, #{@player_name}!\n\n"
         puts @state_of_word == @secret_word ? solved_wow : letter_wow
     end
 
@@ -157,7 +159,7 @@ class Game
     end
 
     def bye(name)
-        puts "Goodbye, #{name}, and thanks for playing Hangman!\n--------------------"
+        puts "Goodbye #{name}, and thanks for playing Hangman!\n--------------------"
     end 
 
     def play_hangman 
@@ -172,9 +174,7 @@ class Game
             display_score
             self.saved = false
           end
-          puts "Press Y to play again, or anything else to stop."
-          gets.strip.upcase == 'Y' ? find_if_saves_exist(player_name) : bye(player_name)
-          
+          play_again(player_name)
     end
       
     def choose_save
