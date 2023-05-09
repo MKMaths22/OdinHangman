@@ -132,7 +132,7 @@ class Game
     end
 
     def play_again(name)
-        "Would you like to start another game, #{name}?\n
+        puts "Would you like to start another game, #{name}?\n
         Press Y to play again, or anything else to stop."
         gets.strip.upcase == 'Y' ? find_if_saves_exist(name) : bye(name)
     end 
@@ -195,14 +195,14 @@ class Game
           
     def display_score
       puts "Your knowledge of the secret word so far is: #{state_of_word} \nand #{plural_guesses}"
-      puts "You have #{guesses_remaining == 1 ? 'just one incorrect guess remaining!' : "#{guesses_remaining} incorrect guesses remaining"}" 
+      puts "You have #{guesses_remaining == 1 ? 'just one incorrect guess remaining!' : "#{guesses_remaining} incorrect guesses remaining."}" 
     end
 
     def plural_guesses
         case guesses_remaining
           when MAX_GUESSES then 'no incorrect guesses made (yet)!'
-          when MAX_GUESSES - 1 then "just one incorrect guess made: #{incorrect_guessed_letters[0]}"
-          else "incorrect guesses made: #{incorrect_guessed_letters.join(', ')}"
+          when MAX_GUESSES - 1 then "just one incorrect guess made: #{incorrect_guessed_letters[0]}."
+          else "incorrect guesses made: #{incorrect_guessed_letters.join(', ')}."
         end
     end
 
