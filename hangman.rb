@@ -71,8 +71,7 @@ class Game
         # but does not affect the game that will be reloaded
     end
     
-    def determine_if_saves_exist(name)
-      puts "Nice to see you again, #{name}!" if Dir.exists?(name)
+    def find_if_saves_exist(name)
       Dir.exists?(name) && !Dir.empty?(name) ? choose_reload(name) : play_hangman
     end 
     
@@ -157,6 +156,10 @@ class Game
         number == 1 ? 'space' : "#{number} spaces"
     end
 
+    def bye(name)
+        puts "Goodbye, #{name}, and thanks for playing Hangman!\n--------------------"
+    end 
+
     def play_hangman 
         start_the_game unless reloaded
         # so that reloaded games don't choose a new secret word but enter the do loop
@@ -169,7 +172,9 @@ class Game
             display_score
             self.saved = false
           end
-          choose_reload(player_name)
+          puts "Press Y to play again, or anything else to stop."
+          gets.strip.upcase == 'Y' ? find_if_saves_exist(player_name) : bye(player_name)
+          
     end
       
     def choose_save
@@ -206,7 +211,8 @@ end
 puts "Welcome to Hangman! What is your name?"
 name = gets.strip
 game = Game.new(name)
-game.determine_if_saves_exist(name)
+puts "Nice to see you again, #{name}!" if Dir.exists?(name)
+game.find_if_saves_exist(name)
 
 # to implement a saved games regieme in which the player is asked at the start
 # of the program for their name. If their name matches a directory of saved games,
